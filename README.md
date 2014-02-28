@@ -1,2 +1,2 @@
 Запуск:
-	untitled.html
+	Blackjack.html

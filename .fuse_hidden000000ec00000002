@@ -1,0 +1,13 @@
+<html>
+<head> 
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title> ДД </title>
+	<script type="text/javascript" src="./scripts/CardScript.js">
+	</script>
+</head>
+<body>
+	<canvas id="cnv"> </canvas>
+	<button id="btn_click"> Новая игра </button>
+	<button id="btn_jop"> Забрать </button>
+</body>
+</html>

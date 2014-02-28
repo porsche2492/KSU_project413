@@ -97,11 +97,14 @@ var TGameManager = function(){
 		}
 	};
 
+	this.getTrump = function(){
+		return deck.getTrump();
+	};
 	this.NewGame = function(){		// новая игра типа
 		deck   = new TDeck();	// новая колода
 		hand_1 = new THand();	// первая рука
 		hand_2 = new THand();	// вторая рука
-		attackHand = undefined; // Атакующая рука
+		attackHand = hand_1; // Атакующая рука
 		toFill = [hand_1, hand_2];
 		fillHand();
 	};
@@ -121,32 +124,47 @@ var TGameManager = function(){
 			
 	};
 
-	
-
 	this.move = function(state,ind){
-		var attack = function(attacker,ind){toDef = attacker.popItemByInd(ind); return toDef.getCard();}
+		var attack = function(attacker,ind){
+			toDef = attacker.popItemByInd(ind); 
+			return 'attack: ' + toDef.getCard();
+		}
 		var defence= function(defender,ind){
 			var card = defender.popItemByInd(ind);
 			console.log('Def: ', card.getCard());
 			if (card.getType() === toDef.getType() && card.getValue() > toDef.getValue()){ // одна масть
-				return 'ok not trump';
+				fillHand();
+				return card.getCard()+' -> ' + toDef.getCard();
 			}else if (deck.getTrump() === toDef.getType()){ // нужно бить козырь 
 				// козырь бьется козырем
 				if (card.getType() === deck.getTrump() && card.getValue() > toDef.getValue()){
-					return 'ok trump';
+					fillHand();
+					return card.getCard()+' -> ' + toDef.getCard();
 				}
 			}else if (card.getType() === deck.getTrump() && toDef.getType() !== deck.getTrump()){ 
 				// козырь бьет не козырь
-				return 'ok trump_notTrump';
+				fillHand();
+				return card.getCard()+' -> ' + toDef.getCard();
 			}
-				return 'JOPA';
+			
+			defender.pushOne(card);
+			return 'JOPA, NONONO';
+		}
+		var take = function(defender){
+			if (toDef !== undefined)
+				defender.pushOne(toDef);
+				fillHand();
+				return 'TAKE JOP';
+			return 'NONONO , JOP';
 		}
 		var res = '';
 		if (state === 'attack')
 			res = "attack: " + attack(attackHand, ind);
 		else if (state === 'def')
 			res = defence((hand_1 === attackHand ? hand_2 : hand_1), ind);
-
+		else if (state === 'take')
+			res = take((hand_1 === attackHand ? hand_2 : hand_1));
+		return res;
 		console.log(res);
 	}
 	this.test = function(){
@@ -165,23 +183,108 @@ var TGameManager = function(){
 			if (i < h1.CardsCount()) 
 				this.move('attack' ,i);
 			for (var j=0;j<h2.CardsCount(); ++j){
-				if (this.move('def', j) !== 'JORA') break;
+				if (this.move('def', j) !== 'JOPA') break;
 			}
 		}
+	}
+	this.drawCards = function(ctx){
+		var cl  = hand_1.showCards();
+		ctx.beginPath();
+		for (var i=0;i<cl.length; ++i)
+			 ctx.fillText(cl[i].getCard(),10, 10 + i*10);
+	
+		cl  = hand_2.showCards();
+		for (var i=0;i<cl.length; ++i)
+			 ctx.fillText(cl[i].getCard(), 100, 10 + i*10);
+	
+		ctx.stroke();
+	}
+	this.getCard = function(hand_ind , card_ind){
+		var cards = (hand_ind ? hand_2 : hand_1).showCards();
+		var card  = undefined;
+		if (cards.length > 0){
+			card = cards[card_ind]
+		};
+		return card;
+	}
+	this.hand_ind;
+	this.card_ind;
+	this.selected_card;
+	this.moveByInd = function(){
+		var res = '';
+		var attackHandInd = (attackHand == hand_1 ? 0 : 1); 
+		if (this.hand_ind == attackHandInd){
+			res = this.move('attack', this.card_ind);
+		}else{
+			res = this.move('def', this.card_ind);
+		}
+		return res;
+	}
+	this.jop = function(){
+		var res = '';
+		var attackHandInd = (attackHand == hand_1 ? 0 : 1); 
+		res = this.move('take');
+
+		return res;
 	}
 }
 
 window.onload = function(){
 	var btn_get_card = document.getElementById('btn_click');
+	var cnv = document.getElementById('cnv');
+	var btn_take = document.getElementById('btn_jop');
 	/*var deck = new TDeck();
 	var hand_1 = new THand();
 	var hand_2 = new THand();
 	*/
-	var manager = new TGameManager(); 
+	var manager = new TGameManager();
+	
+	btn_take.onclick = function(){
+		var ctx = cnv.getContext('2d');
+		ctx.clearRect(0,0, 300, 150)
+
+		var tx = manager.jop();
+		ctx.strokeText(tx, 170,10);
+		
+		ctx.strokeText(" trump: "+types[manager.getTrump()], 250,10);
+
+		manager.drawCards(ctx);
+	}
+
+	cnv.onclick = function(e){
+		var ctx = cnv.getContext('2d');
+		ctx.clearRect(0,0, 300, 150)
+
+		manager.hand_ind = Math.min(Math.max(0,Math.floor(e.x/100)),1);
+		manager.card_ind = Math.min(Math.max(0,Math.floor((e.y-10)/10)), 5);
+		manager.selected_card = manager.getCard(manager.hand_ind, manager.card_ind);
+		
+		ctx.strokeText(" trump: "+types[manager.getTrump()], 250,10);
+		
+		var tx = manager.moveByInd();
+		ctx.strokeText(tx, 170,10);
+		
+		manager.drawCards(ctx);
+	};
+	cnv.onmousemove = function(e){
+		/*var ctx = cnv.getContext('2d');
+		ctx.clearRect(150,0, 200, 100);
+
+		manager.hand_ind = Math.min(Math.max(0,Math.floor(e.x/100)),1);
+		manager.card_ind = Math.min(Math.max(0,Math.floor((e.y-10)/10)), 5);
+		manager.selected_card = manager.getCard(manager.hand_ind, manager.card_ind);
+		ctx.strokeText(" card: "+manager.selected_card.getCard(), 170,10);
+	*/
+	}
+
 	btn_get_card.onclick = function(){
 		// новая игра
 		manager.NewGame();
 		manager.showHands();
-		manager.test();
+		var ctx = cnv.getContext('2d');
+		manager.drawCards(ctx);
+		ctx.strokeText(" trump: "+types[manager.getTrump()], 250,10);
+		//manager.fillHand();
+		//manager.test();
 	};
 };
