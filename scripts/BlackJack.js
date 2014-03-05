@@ -1,4 +1,30 @@
 var TGameManager = function(){
+	var TCash = function(cash){
+		var _cash = cash;
+		var _bet = 0;
+
+		this.AddToCash=function(toAdd){
+			_cash += toAdd;
+		}
+		this.SubFromCash=function(toSub){
+			_cash -= toSub;
+		}
+
+		this.SetBet = function(bet){
+			_bet = Math.max(Math.min(bet, _cash), 0 ); // Ставка от 0 до _cash
+		}
+		this.AddToBet = function(toAdd){
+			_bet += toAdd;
+			SetBet(_bet); // проверка на ставку большую, чем доступный остаток
+		}
+		this.SubFromBet = function(toSub){
+			_bet -= toSub;
+			SetBet(_bet); // проверка на ставку большую, чем доступный остаток	
+		}
+
+		this.GetCash = function(){return _cash;};
+		this.GetBet  = function(){return _bet;};
+	}
 	var TCard = function(weight, description){
 		var _weight = weight;			// вес карты
 		var _description = description;	// описание
@@ -86,15 +112,28 @@ var TGameManager = function(){
 		}
 	}
 
+	var STARTUPCASH = 1000;
+	var isOver		= false; 			// конец игры. [банкротство]
 	var deck 		= new TDeck();
 	var playerHand 	= new THand();
 	var dillerHand 	= new THand();
+	var playerCash  = new TCash(STARTUPCASH);
+	playerCash.SetBet(100);
 
 	this.NewRound	= function(){
 		playerHand.clear();
 		dillerHand.clear();
 		deck.clear();
 		console.log('игрок');
+
+		var c = playerCash.GetCash();
+		var b = playerCash.GetBet();
+		console.log('cash: '+c + ' bet: '+b);
+		
+		if (c<=0){
+			console.log('"ВЫ БАНКРОТ"(с)');
+			playerCash = new TCash(STARTUPCASH);
+		}
 	}
 	this.takePlayerCard = function(){
 		var card = deck.getCard();
@@ -117,6 +156,7 @@ var TGameManager = function(){
 		var playerSum = playerHand.getSum();
 		if (playerSum > 21){
 			console.log('игрок перебрал');
+			playerCash.SubFromCash(playerCash.GetBet());
 		}else{
 
 			dillerHand.AddCard(deck.getCard());
@@ -134,20 +174,27 @@ var TGameManager = function(){
 
 			if (playerSum > dillerSum){
 				console.log('win ['+playerSum+']['+dillerSum+']');
+				playerCash.AddToCash(playerCash.GetBet());
 			}else if (playerSum < dillerSum){
 				console.log('lose ['+playerSum+']['+dillerSum+']');
+				playerCash.SubFromCash(playerCash.GetBet());
 			}else{
 				console.log('draw ['+playerSum+']['+dillerSum+']');
+				playerCash.SubFromCash(0);
 			}
-
 		}
 		this.NewRound();	
 	}
+
+	this.SetBet = function(bet){
+		playerCash.SetBet(bet);
+	};
 }
 
 window.onload = function(){
 	var btn_takeCard 	= document.getElementById('btn_takeCard');
 	var btn_stop		= document.getElementById('btn_stop');
+	var element_bet  	= document.getElementById('bet');
 
 	var manager = new TGameManager();
 	manager.NewRound();
@@ -158,5 +205,9 @@ window.onload = function(){
 
 	btn_stop.onclick = function(){
 		manager.takeDillerCards();
+	}
+
+	element_bet.oninput = function(){
+		manager.SetBet(element_bet.value);
 	}
 }
