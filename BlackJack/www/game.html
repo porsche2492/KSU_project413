@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <title>Game</title>
+
+    <!-- Ссылки WinJS -->
+    <link href="//Microsoft.WinJS.2.0/css/ui-dark.css" rel="stylesheet" />
+    <script src="//Microsoft.WinJS.2.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.2.0/js/ui.js"></script>
+
+    <!-- Ссылки Fool -->
+    <link href="css/default.css" rel="stylesheet" />
+    <script src="js/default.js"></script>
+</head>
+<body>
+    <div class="area" id="table">
+        <div class="area" id="left" style="">
+            <div class="area" id="game_time" style="">
+                <p>game_time</p>
+            </div>
+            <div class="area" id="old_cards" style="">
+                
+            </div>
+            <div class="area" id="left_button" style="">
+                <input id="button_left" type="button" value="Выход" class="button" onclick="location.href='index.html';" />
+            </div>
+        </div>
+        <div class="area" id="mid" style="">
+            <div class="area" id="player2_cards" style="">
+                <div class="card close" style="left:110px;">
+                    <p>card</p>
+                </div>
+            </div>
+            <div class="area" id="game_area" style="">
+                <p>game_area</p>
+            </div>
+            <div class="area" id="player1_cards" style="">
+                <div class="card open" style="left:110px;">
+                    <p>card</p>
+                </div>
+            </div>
+        </div>
+        <div class="area" id="right" style="">
+            <div class="area" id="stars" style="">
+                <p>stars</p>
+            </div>
+            <div class="area" id="new_cards" style="">
+                <div id="pool_cards" style="position:absolute; left:45%; top:37%;">
+                    <div class="card close" id="pool_new_cards">
+                        <p>card</p>
+                    </div>
+                    <p id="count_cards" style="margin-top:150px;">
+                        Количество карт: 34
+                    </p>
+                </div>
+            </div>
+            <div class="area" id="right_button" style="">
+                <input id="button_right" type="button" value="Завершить ход" class="button"/>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

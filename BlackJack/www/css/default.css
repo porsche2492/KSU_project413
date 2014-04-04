@@ -1,0 +1,119 @@
+﻿/**/
+
+body {
+
+}
+
+/*Классы*/
+
+.area{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid black;
+}
+
+.card{
+    width: 90px;
+    height: 140px;
+    position: absolute;
+    top: 0px;
+    cursor: pointer;
+}
+
+.open{
+    background-color: #aaaaaa;
+}
+
+.close{
+    background-color: #0000aa;
+}
+
+.button{
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.button_main{
+    width: 300px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.buttons_area{
+    top: 80%; 
+    left: 50%; 
+    width: 300px;
+    margin-left: -150px;
+}
+
+/*ID*/
+/*Основные классы разделения на области*/
+#table{
+    width: 100%;
+    height: 100%;
+}
+
+#left{
+    width: 20%;
+}
+
+#mid{
+    width: 55%; 
+    left: 20%; 
+}
+
+#right{
+    width: 25%; 
+    left: 75%;
+}
+
+/*Левая область*/
+#game_time{
+    height: 10%; 
+}
+
+#old_cards{
+    height: 80%; 
+    top: 10%; 
+}
+
+#left_button{
+    height: 10%; 
+    top: 90%; 
+}
+
+/*Центральная область*/
+#player2_cards{
+    height: 25%; 
+}
+
+#game_area{
+    height: 50%; 
+    top:25%; 
+}
+
+#player1_cards{
+    height: 25%; 
+    top:75%; 
+}
+
+/*Правая область*/
+#stars{
+    height: 10%; 
+}
+
+#new_cards{
+    height: 80%; 
+    top: 10%; 
+}
+
+#right_button{
+    height: 10%; 
+    top: 90%; 
+}
