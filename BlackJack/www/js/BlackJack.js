@@ -52,10 +52,10 @@ var TGameManager = function(){
 			new TCard(10, 'Король'),
 			new TCard(11, 'Туз')
 			]
-		
+
 		//var deck_count = 8;		// количество колод в новой колоде
 		var deck_count = 1;		// количество колод в новой колоде
-		
+
 		var cards = [];			// новая колода
 		var n = deck_count*posible_cards.length - 1; // индекс конца неиспользуемой части колоды
 
@@ -91,7 +91,7 @@ var TGameManager = function(){
 		}
 		this.CorrectAces = function(){
 			for (var i=0;i<cards.length; ++i){
-				if (cards[i].getDescription() === 'Туз' && cards[i].getWeight() === 11){
+				if (sum > 21 && cards[i].getDescription() === 'Туз' && cards[i].getWeight() === 11){
 					sum -= 10;
 					cards[i].correctAceWeight();
 					break;
@@ -123,32 +123,38 @@ var TGameManager = function(){
 	this.NewRound	= function(){
 		playerHand.clear();
 		dillerHand.clear();
-		deck.clear();
+		deck = new TDeck();
 		console.log('игрок');
 
 		var c = playerCash.GetCash();
 		var b = playerCash.GetBet();
 		console.log('cash: '+c + ' bet: '+b);
-		
+
 		if (c<=0){
 			console.log('"ВЫ БАНКРОТ"(с)');
 			playerCash = new TCash(STARTUPCASH);
 		}
 	}
 	this.takePlayerCard = function(){
-		var card = deck.getCard();
-		playerHand.AddCard(card);
+		if (playerHand.getSum() < 21){
+			var card = deck.getCard();
+			playerHand.AddCard(card);
 
-		var sum = playerHand.getSum();
-		if (sum > 21){
-			//пытаемся уменьшить вес тузов;
-			playerHand.CorrectAces();
-			if (playerHand.getSum() > 21)
-				sum = -1;
-		}
+			var sum = playerHand.getSum();
+			if (sum > 21){
+				//пытаемся уменьшить вес тузов;
+				playerHand.CorrectAces();
+				if (playerHand.getSum() > 21){
+					//sum = -1;
+					console.log(playerHand.cards_to_str());
+					this.takeDillerCards();
+				}
+			}else if (sum == 21){
+				console.log(' !!! 21 !!! ');
+			}
 
 		console.log(playerHand.cards_to_str());
-
+		}
 		return sum;
 	}
 	this.takeDillerCards = function(){
@@ -192,8 +198,8 @@ var TGameManager = function(){
 }
 
 window.onload = function(){
-	var btn_takeCard 	= document.getElementById('btn_takeCard');
-	var btn_stop		= document.getElementById('btn_stop');
+	var btn_takeCard 	= document.getElementById('pool_new_cards');
+	var btn_stop		= document.getElementById('button_right');
 	var element_bet  	= document.getElementById('bet');
 
 	var manager = new TGameManager();
