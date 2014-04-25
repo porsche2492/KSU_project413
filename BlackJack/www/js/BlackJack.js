@@ -1,25 +1,31 @@
 var TGameManager = function(){
-	var TCash = function(cash){
+	var TCash = function(cash, callback){
 		var _cash = cash;
 		var _bet = 0;
+		var _callback = callback;
 
 		this.AddToCash=function(toAdd){
 			_cash += toAdd;
+			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 		this.SubFromCash=function(toSub){
 			_cash -= toSub;
+			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 
 		this.SetBet = function(bet){
 			_bet = Math.max(Math.min(bet, _cash), 0 ); // Ставка от 0 до _cash
+			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 		this.AddToBet = function(toAdd){
 			_bet += toAdd;
-			SetBet(_bet); // проверка на ставку большую, чем доступный остаток
+			this.SetBet(_bet); // проверка на ставку большую, чем доступный остаток
+			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 		this.SubFromBet = function(toSub){
 			_bet -= toSub;
-			SetBet(_bet); // проверка на ставку большую, чем доступный остаток	
+			this.SetBet(_bet); // проверка на ставку большую, чем доступный остаток	
+			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 
 		this.GetCash = function(){return _cash;};
@@ -127,6 +133,9 @@ var TGameManager = function(){
 			sum = 0;
 			cards = [];	
 		}
+		this.isEmpty = function(){
+			return (cards.length === 0);
+		}
 	}
 
 	var STARTUPCASH = 1000;
@@ -134,7 +143,7 @@ var TGameManager = function(){
 	var deck 		= new TDeck();
 	var playerHand 	= new THand();
 	var dillerHand 	= new THand();
-	var playerCash  = new TCash(STARTUPCASH);
+	var playerCash  = new TCash(STARTUPCASH, this.onPlayerCashChange);
 	this.isRoundFinished = true;
 	this.delay = 1000;
 	playerCash.SetBet(100);
@@ -149,15 +158,17 @@ var TGameManager = function(){
 
 		var c = playerCash.GetCash();
 		var b = playerCash.GetBet();
+		playerCash = new TCash(c, this.onPlayerCashChange);
+		playerCash.SetBet(b);
 		console.log('cash: '+c + ' bet: '+b);
 
 		if (c<=0){
 			console.log('"ВЫ БАНКРОТ"(с)');
-			playerCash = new TCash(STARTUPCASH);
+			playerCash = new TCash(STARTUPCASH, this.onPlayerCashChange);
 		}
 	}
 	this.takePlayerCard = function(){
-		if (this.isRoundFinished ===  true)
+		if (this.isRoundFinished ===  true || playerHand.GetC)
 			this.NewRound();
 		//this.isRoundFinished = false;
 		if (playerHand.getSum() < 21){
@@ -225,8 +236,13 @@ var TGameManager = function(){
 	}
 
 	this.SetBet = function(bet){
-		playerCash.SetBet(bet);
+		if (playerHand.isEmpty() === true && dillerHand.isEmpty() === true)
+			playerCash.SetBet(bet);
 	};
+	this.AddToBet = function(to_add){
+		if (playerHand.isEmpty() === true && dillerHand.isEmpty() === true)
+			playerCash.AddToBet(to_add);
+	}
 
 	this.onPlayer21 = function(){
 		/* игрок набрал 21.*/
@@ -292,15 +308,23 @@ var TGameManager = function(){
 		/* Вызывается при взятии карты игроком */
 
 	}
+
+	this.onPlayerCashChange = function(){
+		/*вызывается при пересчете*/
+	}
 }
 
 window.onload = function(){
 	var btn_takeCard 			= document.getElementById('pool_new_cards');
 	var btn_stop				= document.getElementById('button_right');
 	var element_bet  			= document.getElementById('bet');
-	var game_area = document.getElementById('game_area');
-
+	var game_area 				= document.getElementById('game_area');
+	var playerCashArea 			= document.getElementById('player_cash');
 	var playerCardsContainer 	= document.getElementById('player1_cards');
+	var add100 					= document.getElementById('add100');
+	var add10 					= document.getElementById('add10');
+	var set0 					= document.getElementById('set0');
+
 	var onPlayerGetCard_callback = function(card){
 		var nimg = document.createElement('img');
 		nimg.src = card.img_src;
@@ -353,15 +377,22 @@ window.onload = function(){
 		}
 	}
 
+	var onPlayerCashChange_callback = function(player_cash, playerBet){
+		playerCashArea.innerHTML = "<p> Остаток: " + player_cash + "</p>";
+		playerCashArea.innerHTML += "<p> Ставка: " + playerBet + "</p>";
+	}
+
 	var manager = new TGameManager();
 
 	// передаем колбЭки
 	manager.onPlayerGetCard = onPlayerGetCard_callback;
 	manager.onNewRound = onNewRound_callback;
 	manager.onDillerGetCard = onDillerGetCard_callback;
+	manager.onPlayerCashChange = onPlayerCashChange_callback;
 	// --------------
 
-	manager.NewRound();
+	//manager.NewRound();
+	manager.onPlayerCashChange();
 
 	game_area.onclick = function(){
 		if (manager.isRoundFinished === true)
@@ -369,14 +400,24 @@ window.onload = function(){
 	}
 
 	btn_takeCard.onclick = function(){
+		if (manager.isRoundFinished === false)
 		manager.takePlayerCard();
 	}
 
 	btn_stop.onclick = function(){
-		manager.takeDillerCards();
+		if (manager.isRoundFinished === false)
+			manager.takeDillerCards();
+	} 
+
+	set0.onclick = function(){
+		manager.SetBet(0);
 	}
 
-	element_bet.oninput = function(){
-		manager.SetBet(element_bet.value);
+	add10.onclick = function(){
+		manager.AddToBet(10);
+	}
+
+	add100.onclick = function(){
+		manager.AddToBet(100);
 	}
 }
