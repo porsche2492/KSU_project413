@@ -53,7 +53,7 @@ var TGameManager = function(){
 	}
 	var TDeck = function(){
 		var base_dir	= "images/game_cart/";
-		var possible_types = [1,2]; // возможные масти
+		var possible_types = [1,2,3,4]; // возможные масти
 		var possible_cards = [		// возможные карты
 			new TCard(2, '2','2'),
 			new TCard(3, '3','3'),
