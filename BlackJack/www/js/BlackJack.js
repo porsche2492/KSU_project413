@@ -306,11 +306,10 @@ var TGameManager = function(){
 	}
 	this.onDillerGetCard = function(card){
 		/* Вызывается при взятии карты игроком */
-
 	}
 
 	this.onPlayerCashChange = function(){
-		/*вызывается при пересчете*/
+		/*вызывается при пересчете*/v
 	}
 }
 
@@ -324,6 +323,10 @@ window.onload = function(){
 	var add100 					= document.getElementById('add100');
 	var add10 					= document.getElementById('add10');
 	var set0 					= document.getElementById('set0');
+
+	var radioBtn_bg1 			= document.getElementById('background1'); 
+	var radioBtn_bg2 			= document.getElementById('background2');
+	var radioBtn_bg3 			= document.getElementById('background3');
 
 	var onPlayerGetCard_callback = function(card){
 		var nimg = document.createElement('img');
@@ -419,5 +422,26 @@ window.onload = function(){
 
 	add100.onclick = function(){
 		manager.AddToBet(100);
+	}
+
+	radioBtn_bg1.onchange = function(){
+		if (radioBtn_bg1.checked === true){
+			document.getElementById("pool_new_cards").style.backgroundImage = 'url("images/game_cart/0.png")';
+		}
+	}
+	radioBtn_bg2.onchange = function(){
+		if (radioBtn_bg2.checked === true){
+			document.getElementById("pool_new_cards").style.backgroundImage = 'url("images/game_cart/R1.png")';
+		}
+	}
+	radioBtn_bg3.onchange = function(){
+		if (radioBtn_bg3.checked === true){
+			document.getElementById("pool_new_cards").style.backgroundImage = 'url("images/game_cart/R2.png")';
+		}
+	}
+	radioBtn_bg4.onchange = function(){
+		if (radioBtn_bg4.checked === true){
+			document.getElementById("pool_new_cards").style.backgroundImage = 'url("images/game_cart/R3.png")';
+		}
 	}
 }
