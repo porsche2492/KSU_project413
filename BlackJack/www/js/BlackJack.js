@@ -324,9 +324,12 @@ window.onload = function(){
 	var add10 					= document.getElementById('add10');
 	var set0 					= document.getElementById('set0');
 
+	add10.hidden = add100.hidden = set0.hidden = true;
+
 	var radioBtn_bg1 			= document.getElementById('background1'); 
 	var radioBtn_bg2 			= document.getElementById('background2');
 	var radioBtn_bg3 			= document.getElementById('background3');
+	var radioBtn_bg4 			= document.getElementById('background4');
 
 	var onPlayerGetCard_callback = function(card){
 		var nimg = document.createElement('img');
@@ -383,6 +386,7 @@ window.onload = function(){
 	var onPlayerCashChange_callback = function(player_cash, playerBet){
 		playerCashArea.innerHTML = "<p> Остаток: " + player_cash + "</p>";
 		playerCashArea.innerHTML += "<p> Ставка: " + playerBet + "</p>";
+		console.log(playerBet);
 	}
 
 	var manager = new TGameManager();
@@ -398,8 +402,10 @@ window.onload = function(){
 	manager.onPlayerCashChange();
 
 	game_area.onclick = function(){
-		if (manager.isRoundFinished === true)
+		if (manager.isRoundFinished === true){
+			add10.hidden = add100.hidden = set0.hidden = false;
 			manager.NewRound();
+		}
 	}
 
 	btn_takeCard.onclick = function(){
