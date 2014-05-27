@@ -1,49 +1,155 @@
+/*******************************************************************************
+*  Класс, реализующий логику приложения.                                       *
+*  Содержит методы, которые должны быть привязаны к соответствующим элементам  *
+*  графической оболочки приложения (по нажатию на кнопку "взять карту"         *
+*  вызывается метод takePlayerCard и т.д.).                                    *
+*******************************************************************************/
 var TGameManager = function(){
-	var TCash = function(cash, callback){
-		var _cash = cash;
-		var _bet = 0;
-		var _callback = callback;
 
+	/******************************************************************************************
+	* Класс, реализующий "денежные" операции. Содержит текущий счет, текущую ставку.          *
+	*         cash     -- начальная сумма                                                     *
+	*         callback -- функция, которая вызывается при изменение ставки или суммы на счету *
+	*         Constructor params: cash     <-- int                                            *
+	*                             callback <-- function                                       *
+	*                                                                                         *
+	*         callback params:    cash     <-- int                                            *
+	* 	                    bet      <-- int                                                  *
+	******************************************************************************************/
+	var TCash = function(cash, callback){
+		var _cash = cash;			// сумма на счету
+		var _bet = 0;				// ставка
+		var _callback = callback;	// коллбэк
+
+		/*
+			Увеличить текущий счет на заданную сумму. 
+			После выполнения основных действий функции будет вызван переданный callback, если он определен
+			
+			param: toadd   <-- int
+			@return undefined
+		*/
 		this.AddToCash=function(toAdd){
 			_cash += toAdd;
 			if (_callback !== undefined) _callback(_cash, _bet);
 		}
+
+		/*
+			Уменьшить текущий счет на заданную сумму. 
+			После выполнения основных действий функции будет вызван переданный callback, если он определен
+			
+			param: tosub  <-- int
+			@return undefined
+		*/
 		this.SubFromCash=function(toSub){
 			_cash -= toSub;
 			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 
+		/*
+			Задать текущую ставку. 
+			После выполнения основных действий функции будет вызван переданный callback, если он определен
+			
+			param: bet   <-- int
+			@return undefined
+		*/
 		this.SetBet = function(bet){
 			_bet = Math.max(Math.min(bet, _cash), 0 ); // Ставка от 0 до _cash
 			if (_callback !== undefined) _callback(_cash, _bet);
 		}
+
+		/*
+			Увеличить ставку. 
+			После выполнения основных действий функции будет вызван переданный callback, если он определен
+			
+			param: toadd   <-- int
+			@return undefined
+		*/
 		this.AddToBet = function(toAdd){
 			_bet += toAdd;
 			this.SetBet(_bet); // проверка на ставку большую, чем доступный остаток
 			if (_callback !== undefined) _callback(_cash, _bet);
 		}
+
+		/*
+			Уменьшить ставку. 
+			После выполнения основных действий функции будет вызван переданный callback, если он определен
+			
+			param: tosub   <-- int
+			@return undefined
+		*/
 		this.SubFromBet = function(toSub){
 			_bet -= toSub;
 			this.SetBet(_bet); // проверка на ставку большую, чем доступный остаток	
 			if (_callback !== undefined) _callback(_cash, _bet);
 		}
 
+		/*
+			Получить доступный остаток
+			@return int
+		*/
 		this.GetCash = function(){return _cash;};
+		
+		/*
+			Получить текущую ставку
+			@return int
+		*/
 		this.GetBet  = function(){return _bet;};
 	}
+
+	/****************************************************************************************
+	*	Класс, моделирующий объект "карта".Содержит краткое английское имя карты, вес карты *
+	*	описание карты, путь к файлу-изображению карты.                                     *
+    *                                                                                       *
+	*	eng_short_description -- краткое английское имя карты (J, Q, K, A)                  *
+	*	weight                -- "вес" карты при подсчете суммы карт.                       *
+	*	description           -- описание карты	(пример: валет, дама, король, туз)          *
+	*   img_src               -- путь к файлу, который будет привязын к карте (изображение) *
+	*	                                                                                    *
+	*   Constructor params: weight                 <-- int 									*			
+	*						description            <-- string								*			
+	*						eng_short_description  <-- string                               *
+	*****************************************************************************************/
 	var TCard = function(weight, description, eng_short_description){
 		var _eng_short_description = eng_short_description; // краткое английское название карты (A,K,Q,J,10,9,8,7,6,5,4,3,2)
 		var _weight = weight;			// вес карты
 		var _description = description;	// описание
-		this.img_src = "";			// путь к файлу-изображению карты
+		this.img_src = "";			    // путь к файлу-изображению карты
+		
+		/*
+			получить краткое английское описание 
+			@return string
+		*/
 		this.getEngShortDescription = function(){return _eng_short_description;}
+		
+		/*
+			получить "вес" карты при подсчете набранных очков
+			@return int
+		*/
 		this.getWeight = function(){return _weight;}
+		
+		/*
+			получить  описание 
+			@return string
+		*/
 		this.getDescription = function(){return _description;} 
+		
+		/*
+			изменить "вес" туза 
+			@return undefined
+		*/
 		this.correctAceWeight = function(){
 			if (_description === 'Туз'){
 				_weight = 1;
 			}
 		}
+
+		/*
+			функция копирования информации из экземпляра класса TCard
+
+			params : base_card  <-- TCard
+
+			@return undefined
+		*/
 		this.copyCard = function(base_card){
 			/* копирует информацию, сохраненную в экземпляре base_card в текущий*/
 			_weight 		= base_card.getWeight();
@@ -51,10 +157,28 @@ var TGameManager = function(){
 			_eng_short_description = base_card.getEngShortDescription();
 		}
 	}
+
+	/*********************************************************************
+	* Класс, моделирующий объект "колода". Содержит информацию           *
+	* о пути к файлу с изображениями карт, информацию об используемых    *
+	* картах (под информацией понимается масть, значение), количество    *
+	* используемых колод (по умолчанию одна), список карт в колоде и     *
+	* количество "незадействованных" карт.                               *
+	*                                                                    *
+	* При вызове конструктора происходит генерация игровых карт (колод). *
+	* Сгенерированные карты (TCard) заносятся в список карт (cards).     *
+	*                                                                    *
+	* base_dir       -- путь к папке с файлами-изображениями             *
+	* possible_types -- задействованные масти                            *
+	* possible_cards -- задействованные карты (от двойки до туза)        *
+	* deck_count     -- число колод                                      *
+	* cards          -- список карт                                      *
+	* n              -- число карт в колоде                              *
+	*********************************************************************/
 	var TDeck = function(){
 		var base_dir	= "images/game_cart/";
 		var possible_types = [1,2,3,4]; // возможные масти
-		var possible_cards = [		// возможные карты
+		var possible_cards = [		    // возможные карты
 			new TCard(2, '2','2'),
 			new TCard(3, '3','3'),
 			new TCard(4, '4','4'),
@@ -71,9 +195,9 @@ var TGameManager = function(){
 			]
 
 		//var deck_count = 8;		// количество колод в новой колоде
-		var deck_count = 1;		// количество колод в новой колоде
+		var deck_count = 1;		    // количество колод в новой колоде
 
-		var cards = [];			// новая колода
+		var cards = [];		    	// новая колода
 		var n = deck_count*possible_cards.length*possible_types.length - 1; // индекс конца неиспользуемой части колоды
 
 		for (var i=0;i<deck_count; ++i){
@@ -88,6 +212,11 @@ var TGameManager = function(){
 				}
 		};
 
+		/*
+			взять карту из колоды
+
+			@return TCard
+		*/
 		this.getCard = function(){
 			var swap = function(a,i,j){ var buf = a[i]; a[i] = a[j]; a[j] = buf;};
 			swap(cards, Math.floor(Math.random()*n),n);
@@ -96,13 +225,30 @@ var TGameManager = function(){
 			return cards[n--];
 		}
 
+		/*
+			"вернуть карты в колоду"
+
+			@return undefined
+		*/
 		this.clear 	 = function(){
 			n = deck_count*possible_cards.length - 1;	
 		} 
 	}
+
+	/********************************************************************
+	* Класс, реализующий объект "рука", т.е. игрок или дилер. Содержит  *
+	* информацию о сумме карт в руке и самих картах.                    *
+	********************************************************************/
 	var THand = function(){
-		var sum = 0;
-		var cards = [];
+		var sum = 0;		// суммарный вес карт
+		var cards = [];		// карты
+		
+		/*
+			добавить карту, добавить вес карты к сумме
+
+			params: card  <-- TCard
+			@return undefined
+		*/
 		this.AddCard = function(card){
 			cards.push(card);
 			var w = card.getWeight();
@@ -112,6 +258,12 @@ var TGameManager = function(){
 
 			sum += w;
 		}
+		
+		/*
+			скорректировать вес тузов
+
+			@return undefined
+		*/
 		this.CorrectAces = function(){
 			for (var i=0;i<cards.length; ++i){
 				if (sum > 21 && cards[i].getDescription() === 'Туз' && cards[i].getWeight() === 11){
@@ -121,7 +273,20 @@ var TGameManager = function(){
 				}
 			}
 		}
+
+		/*
+			получить суммарный вес карт в руке
+
+			@return sum  <-- int
+		*/
 		this.getSum = function(){return sum;}
+		
+		/*
+			функция, предоставляющая строковое представление карт. Используется для 
+			отладки
+
+			@return string
+		*/
 		this.cards_to_str = function(){
 			var ret = ' | ';
 			for (var i=0; i<cards.length; ++i){
@@ -129,10 +294,18 @@ var TGameManager = function(){
 			}
 			return ret;
 		}
+
+		/*
+			сброс
+		*/
 		this.clear = function(){
 			sum = 0;
 			cards = [];	
 		}
+
+		/*
+			проверка на наличие карт
+		*/
 		this.isEmpty = function(){
 			return (cards.length === 0);
 		}
@@ -148,6 +321,11 @@ var TGameManager = function(){
 	this.delay = 1000;
 	playerCash.SetBet(100);
 
+	/*
+		Начало нового раунда. Перед началом вызывается соответствующий коллбэк
+
+		@return undefined
+	*/
 	this.NewRound	= function(){
 		this.onNewRound();
 		this.isRoundFinished = false;
@@ -167,6 +345,12 @@ var TGameManager = function(){
 			playerCash = new TCash(STARTUPCASH, this.onPlayerCashChange);
 		}
 	}
+
+	/*
+		функция взятия игроком карты
+
+		@return undefined
+	*/
 	this.takePlayerCard = function(){
 		if (this.isRoundFinished ===  true || playerHand.GetC)
 			this.NewRound();
@@ -193,6 +377,12 @@ var TGameManager = function(){
 		}
 		return sum;
 	}
+
+	/*
+		Функция взятия дилером карт.
+
+		@return undefined
+	*/
 	this.takeDillerCards = function(){
 		console.log('Диллер');
 		var playerSum = playerHand.getSum();
@@ -235,14 +425,28 @@ var TGameManager = function(){
 		this.isRoundFinished = true;	
 	}
 
+	/*
+		Сделать ставку. В параметре передается размер ставки
+
+		param : bet  <-- int
+		@return undefined
+	*/
 	this.SetBet = function(bet){
 		if (playerHand.isEmpty() === true && dillerHand.isEmpty() === true)
 			playerCash.SetBet(bet);
-	};
+	}
+
+	/*
+		Увеличить ставку на заданную сумму. Заданная сумма передается в параметре
+
+		param: to_add  <-- int
+		@return undefined
+	*/
 	this.AddToBet = function(to_add){
 		if (playerHand.isEmpty() === true && dillerHand.isEmpty() === true)
 			playerCash.AddToBet(to_add);
 	}
+
 
 	this.onPlayer21 = function(){
 		/* игрок набрал 21.*/
@@ -324,6 +528,7 @@ window.onload = function(){
 	var add10 					= document.getElementById('add10');
 	var set0 					= document.getElementById('set0');
 
+	// скрыть элементы отвечающие за ставку до начала игры
 	add10.hidden = add100.hidden = set0.hidden = true;
 
 	var radioBtn_bg1 			= document.getElementById('background1'); 
