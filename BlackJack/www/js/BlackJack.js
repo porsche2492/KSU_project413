@@ -525,11 +525,11 @@ window.onload = function(){
 	var playerCashArea 			= document.getElementById('player_cash');
 	var playerCardsContainer 	= document.getElementById('player1_cards');
 	var add100 					= document.getElementById('add100');
-	var add10 					= document.getElementById('add10');
+	var add25 					= document.getElementById('add10');
 	var set0 					= document.getElementById('set0');
 
 	// скрыть элементы отвечающие за ставку до начала игры
-	add10.hidden = add100.hidden = set0.hidden = true;
+	add25.hidden = add100.hidden = set0.hidden = true;
 
 	var radioBtn_bg1 			= document.getElementById('background1'); 
 	var radioBtn_bg2 			= document.getElementById('background2');
@@ -627,8 +627,8 @@ window.onload = function(){
 		manager.SetBet(0);
 	}
 
-	add10.onclick = function(){
-		manager.AddToBet(10);
+	add25.onclick = function(){
+		manager.AddToBet(25);
 	}
 
 	add100.onclick = function(){

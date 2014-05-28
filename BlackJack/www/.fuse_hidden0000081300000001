@@ -23,7 +23,7 @@
             </div>
             <div class="area" id="old_cards" style="">
                 <button id="add100"> </button>
-                <button id="add10"> </button>
+                <button id="add25"> </button>
                 <button id="set0"> </button>
                 
                 <br>
