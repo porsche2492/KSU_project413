@@ -151,7 +151,7 @@ body {
 
 #new_cards{
     height: 80%; 
-    top: 10%; 
+    top: 20%; 
 	background-size: 100% 100%;
 	min-height:140px;
 }
