@@ -15,6 +15,8 @@ body {
     margin: 0px;
     padding: 0px;
     border: 1px solid black;
+    background-color:#155002;
+    background-size: 100% 100%;
 }
 
 .card{
@@ -23,14 +25,30 @@ body {
     position: absolute;
     top: 0px;
     cursor: pointer;
+    background-size: 100% 100%;
+    -webkit-transition: 1s;
+	-moz-transition: 1s;
+	transition: 1s;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
 }
-
+.card:hover {
+	-webkit-box-shadow: 0 0 10px rgba(255,255,255,4), inset 0 0 20px rgba(255,255,255,1);
+	-moz-box-shadow: 0 0 10px rgba(255,255,255,.4), inset 0 0 10px rgba(255,255,255,1);
+	box-shadow: 0 0 30px rgba(255,255,255,.4), inset 0 0 10px rgba(255,255,255,1);
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+}
 .open{
     background-color: #aaaaaa;
 }
 
 .close{
     background-color: #0000aa;
+    background-image: url(../images/game_cart/0.png);
+    
 }
 
 .button{
@@ -94,8 +112,10 @@ body {
 }
 
 #game_area{
+    background-image: url(../images/background.png);
     height: 50%; 
     top:25%; 
+    background-size: 100% 100%;
 }
 
 #player1_cards{

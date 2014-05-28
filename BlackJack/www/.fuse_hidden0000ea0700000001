@@ -16,7 +16,6 @@
     <script src="js/BlackJack.js"></script>
 </head>
 <body>
-    
     <div class="area" id="table">
         <div class="area" id="left" style="">
             <div class="area" id="game_time" style="">
@@ -27,16 +26,6 @@
                 <button id="add10"> 10 </button>
                 <button id="set0"> сбросить </button>
                 
-                <br>
-                <form id="frm">
-                    <input type="radio" name="st" id="background1" checked="true"> Рубашка №1 </input>
-                    <br>
-                    <input type="radio" name="st" id="background2"> Рубашка №2 </input>
-                    <br>
-                    <input type="radio" name="st" id="background3"> Рубашка №3 </input>
-                    <br>
-                    <input type="radio" name="st" id="background4"> Рубашка №4 </input>
-                </form>
             </div>
             <div class="area" id="left_button" style="">
                 <input id="button_left" type="button" value="Выход" class="button" onclick="location.href='index.html';" />
@@ -49,7 +38,7 @@
                 </div>
             </div>
             <div class="area" id="game_area" style="">
-                <p>game_area</p> 
+                <p>game_area</p>
             </div>
             <div class="area" id="player1_cards" style="">
                 <div class="card open" style="left:110px;">
